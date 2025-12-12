@@ -4,32 +4,34 @@
  */
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Star, Clock, Award } from 'lucide-react';
+import { useLanguage } from '../../contexts/LanguageContext';
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
 
 const Landing = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const features = [
     {
       icon: Calendar,
-      title: 'Easy Booking',
-      description: 'Book your appointments online 24/7 with our simple booking system',
+      title: t('landing.features.easyBooking.title'),
+      description: t('landing.features.easyBooking.description'),
     },
     {
       icon: Star,
-      title: 'Expert Professionals',
-      description: 'Our licensed beauticians have years of experience and ongoing training',
+      title: t('landing.features.expertProfessionals.title'),
+      description: t('landing.features.expertProfessionals.description'),
     },
     {
       icon: Clock,
-      title: 'Flexible Hours',
-      description: 'Open 6 days a week with extended hours to fit your busy schedule',
+      title: t('landing.features.flexibleHours.title'),
+      description: t('landing.features.flexibleHours.description'),
     },
     {
       icon: Award,
-      title: 'Premium Quality',
-      description: 'We use only the highest quality products and latest techniques',
+      title: t('landing.features.premiumQuality.title'),
+      description: t('landing.features.premiumQuality.description'),
     },
   ];
 
@@ -39,27 +41,25 @@ const Landing = () => {
       <section className="gradient-primary text-white py-20 px-4">
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fadeIn">
-            Your Beauty Journey Starts Here
+            {t('landing.heroTitle')}
           </h1>
           <p className="text-xl md:text-2xl mb-8 text-pink-50 max-w-3xl mx-auto animate-fadeIn">
-            Experience professional beauty services in a luxurious, relaxing atmosphere
+            {t('landing.heroSubtitle')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fadeIn">
             <Button
               size="lg"
-              variant="secondary"
               onClick={() => navigate('/book')}
-              className="bg-white text-pink-600 hover:bg-pink-50"
+              className="!bg-white !text-pink-600 hover:!bg-pink-50 font-bold shadow-lg hover:shadow-xl transition-all"
             >
-              Book Appointment
+              {t('landing.bookAppointment')}
             </Button>
             <Button
               size="lg"
-              variant="outline"
               onClick={() => navigate('/services')}
-              className="border-2 border-white text-white hover:bg-white/10"
+              className="!bg-transparent !border-2 !border-white !text-white hover:!bg-white hover:!text-pink-600 font-semibold transition-all"
             >
-              View Services
+              {t('landing.viewServices')}
             </Button>
           </div>
         </div>
@@ -69,7 +69,7 @@ const Landing = () => {
       <section className="py-16 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">
-            Why Choose Us
+            {t('landing.whyChooseUs')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => (
@@ -91,13 +91,13 @@ const Landing = () => {
       <section className="py-16 px-4 bg-gray-50">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-            Ready to Look Your Best?
+            {t('landing.readyTitle')}
           </h2>
           <p className="text-xl text-gray-600 mb-8">
-            Book your appointment today and let our professionals take care of you
+            {t('landing.readySubtitle')}
           </p>
           <Button size="lg" onClick={() => navigate('/register')}>
-            Get Started Now
+            {t('landing.getStarted')}
           </Button>
         </div>
       </section>
@@ -107,10 +107,10 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
-              { number: '10+', label: 'Years Experience' },
-              { number: '5000+', label: 'Happy Clients' },
-              { number: '15+', label: 'Services Offered' },
-              { number: '98%', label: 'Satisfaction Rate' },
+              { number: '10+', label: t('landing.stats.yearsExperience') },
+              { number: '5000+', label: t('landing.stats.happyClients') },
+              { number: '15+', label: t('landing.stats.servicesOffered') },
+              { number: '98%', label: t('landing.stats.satisfactionRate') },
             ].map((stat, index) => (
               <div key={index} className="text-center">
                 <div className="text-4xl md:text-5xl font-bold gradient-primary bg-clip-text text-transparent mb-2">

@@ -4,12 +4,15 @@
  */
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { Menu, X, User, Calendar, LogOut, Settings, LayoutDashboard } from 'lucide-react';
 import { useState } from 'react';
 import Button from '../common/Button';
+import LanguageSelector from '../LanguageSelector';
 
 const Navbar = () => {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -20,20 +23,20 @@ const Navbar = () => {
   };
 
   const navLinks = [
-    { to: '/', label: 'Home' },
-    { to: '/services', label: 'Services' },
+    { to: '/', label: t('nav.home') },
+    { to: '/services', label: t('nav.services') },
   ];
 
   const authLinks = isAuthenticated()
     ? [
         {
           to: isAdmin() ? '/admin/dashboard' : '/dashboard',
-          label: 'Dashboard',
+          label: t('nav.dashboard'),
           icon: LayoutDashboard,
         },
         ...(isAdmin()
           ? []
-          : [{ to: '/book', label: 'Book Appointment', icon: Calendar }]),
+          : [{ to: '/book', label: t('nav.bookAppointment'), icon: Calendar }]),
       ]
     : [];
 
@@ -41,13 +44,18 @@ const Navbar = () => {
     <nav className="bg-white shadow-md sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 gradient-primary rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">B</span>
+          {/* Logo & Language Selector */}
+          <div className="flex items-center gap-4">
+            <Link to="/" className="flex items-center space-x-2">
+              <div className="w-10 h-10 gradient-primary rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-xl">B</span>
+              </div>
+              <span className="text-xl font-bold text-secondary-900">Beauty Salon</span>
+            </Link>
+            <div className="hidden md:block">
+              <LanguageSelector />
             </div>
-            <span className="text-xl font-bold text-secondary-900">Beauty Salon</span>
-          </Link>
+          </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
@@ -80,16 +88,16 @@ const Navbar = () => {
                 </span>
                 <Button variant="ghost" size="sm" onClick={handleLogout}>
                   <LogOut className="w-4 h-4 mr-1" />
-                  Logout
+                  {t('nav.logout')}
                 </Button>
               </div>
             ) : (
               <div className="flex items-center gap-3">
                 <Button variant="ghost" size="sm" onClick={() => navigate('/login')}>
-                  Login
+                  {t('nav.login')}
                 </Button>
                 <Button size="sm" onClick={() => navigate('/register')}>
-                  Sign Up
+                  {t('nav.register')}
                 </Button>
               </div>
             )}
@@ -107,6 +115,11 @@ const Navbar = () => {
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-secondary-200 animate-fadeIn">
+            {/* Language Selector Mobile */}
+            <div className="pb-3 mb-3 border-b border-secondary-200 flex justify-center">
+              <LanguageSelector />
+            </div>
+
             <div className="flex flex-col space-y-3">
               {navLinks.map((link) => (
                 <Link
@@ -142,7 +155,7 @@ const Navbar = () => {
                     className="w-full flex items-center gap-2 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                   >
                     <LogOut className="w-4 h-4" />
-                    Logout
+                    {t('nav.logout')}
                   </button>
                 </div>
               ) : (
@@ -155,7 +168,7 @@ const Navbar = () => {
                       setMobileMenuOpen(false);
                     }}
                   >
-                    Login
+                    {t('nav.login')}
                   </Button>
                   <Button
                     fullWidth
@@ -164,7 +177,7 @@ const Navbar = () => {
                       setMobileMenuOpen(false);
                     }}
                   >
-                    Sign Up
+                    {t('nav.register')}
                   </Button>
                 </div>
               )}
