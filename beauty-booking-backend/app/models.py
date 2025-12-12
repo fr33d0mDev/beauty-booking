@@ -62,8 +62,12 @@ class Service(db.Model):
     __tablename__ = 'services'
 
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.Text)
+    name = db.Column(db.String(100), nullable=False)  # Legacy field, kept for backward compatibility
+    name_en = db.Column(db.String(100))  # English name
+    name_es = db.Column(db.String(100))  # Spanish name
+    description = db.Column(db.Text)  # Legacy field, kept for backward compatibility
+    description_en = db.Column(db.Text)  # English description
+    description_es = db.Column(db.Text)  # Spanish description
     price = db.Column(db.Numeric(10, 2), nullable=False)
     duration = db.Column(db.Integer, nullable=False)  # Duration in minutes
     image_url = db.Column(db.String(255))
@@ -73,12 +77,24 @@ class Service(db.Model):
     # Relationships
     appointments = db.relationship('Appointment', backref='service', lazy='dynamic')
 
-    def to_dict(self):
-        """Convert service object to dictionary"""
+    def to_dict(self, lang='en'):
+        """Convert service object to dictionary
+
+        Args:
+            lang (str): Language code ('en' or 'es'). Defaults to 'en'.
+        """
+        # Select the appropriate name based on language
+        if lang == 'es':
+            name = self.name_es or self.name or self.name_en
+            description = self.description_es or self.description or self.description_en
+        else:
+            name = self.name_en or self.name or self.name_es
+            description = self.description_en or self.description or self.description_es
+
         return {
             'id': str(self.id),
-            'name': self.name,
-            'description': self.description,
+            'name': name,
+            'description': description,
             'price': float(self.price) if self.price else 0,
             'duration': self.duration,
             'image_url': self.image_url,
@@ -113,8 +129,13 @@ class Appointment(db.Model):
         db.Index('idx_appointment_status', 'status'),
     )
 
-    def to_dict(self, include_relations=True):
-        """Convert appointment object to dictionary"""
+    def to_dict(self, include_relations=True, lang='en'):
+        """Convert appointment object to dictionary
+
+        Args:
+            include_relations (bool): Include client and service details
+            lang (str): Language code for service translation ('en' or 'es')
+        """
         data = {
             'id': str(self.id),
             'client_id': str(self.client_id),
@@ -136,7 +157,7 @@ class Appointment(db.Model):
                     'phone': self.client.phone
                 }
             if self.service:
-                data['service'] = self.service.to_dict()
+                data['service'] = self.service.to_dict(lang=lang)
 
         return data
 

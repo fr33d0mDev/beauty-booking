@@ -23,9 +23,15 @@ def get_appointments():
     Query params:
         - status: filter by status (optional)
         - upcoming: true/false (optional, default=false)
+        - lang: language code 'en' or 'es' (optional, default=en)
     """
     try:
         current_user_id = get_jwt_identity()
+
+        # Get language parameter
+        lang = request.args.get('lang', 'en')
+        if lang not in ['en', 'es']:
+            lang = 'en'
 
         query = Appointment.query.filter_by(client_id=current_user_id)
 
@@ -48,7 +54,7 @@ def get_appointments():
         ).all()
 
         return jsonify({
-            'appointments': [apt.to_dict() for apt in appointments],
+            'appointments': [apt.to_dict(lang=lang) for apt in appointments],
             'count': len(appointments)
         }), 200
 

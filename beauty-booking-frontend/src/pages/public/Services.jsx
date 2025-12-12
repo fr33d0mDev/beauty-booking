@@ -10,6 +10,7 @@ import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Loading from '../../components/common/Loading';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const Services = () => {
   const [services, setServices] = useState([]);
@@ -17,14 +18,15 @@ const Services = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { t, language } = useLanguage();
 
   useEffect(() => {
     fetchServices();
-  }, []);
+  }, [language]); // Re-fetch when language changes
 
   const fetchServices = async () => {
     try {
-      const response = await servicesAPI.getAll(true);
+      const response = await servicesAPI.getAll(true, language);
       setServices(response.data.services);
     } catch (err) {
       setError('Failed to load services');
@@ -45,7 +47,7 @@ const Services = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loading text="Loading services..." />
+        <Loading text={t('common.loading')} />
       </div>
     );
   }
@@ -55,9 +57,9 @@ const Services = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-secondary-900 mb-4">Our Services</h1>
+          <h1 className="text-4xl font-bold text-secondary-900 mb-4">{t('services.ourServices')}</h1>
           <p className="text-xl text-secondary-600 max-w-2xl mx-auto">
-            Choose from our wide range of professional beauty services
+            {t('services.exploreServices')}
           </p>
         </div>
 
@@ -70,7 +72,7 @@ const Services = () => {
         {/* Services Grid */}
         {services.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-secondary-600 text-lg">No services available at the moment</p>
+            <p className="text-secondary-600 text-lg">{t('services.noServicesAvailable')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -99,13 +101,13 @@ const Services = () => {
                     {service.name}
                   </h3>
                   <p className="text-secondary-600 mb-4 flex-grow line-clamp-3">
-                    {service.description || 'Professional service tailored to your needs'}
+                    {service.description || t('services.professionalService')}
                   </p>
 
                   <div className="flex items-center justify-between mb-4 text-sm">
                     <div className="flex items-center gap-1 text-secondary-700">
                       <Clock className="w-4 h-4" />
-                      <span>{service.duration} min</span>
+                      <span>{service.duration} {t('services.minutes')}</span>
                     </div>
                     <div className="flex items-center gap-1 text-primary-600 font-semibold text-lg">
                       <DollarSign className="w-5 h-5" />
@@ -117,7 +119,7 @@ const Services = () => {
                     fullWidth
                     onClick={() => handleBookService(service.id)}
                   >
-                    Book Now
+                    {t('services.bookNow')}
                   </Button>
                 </div>
               </Card>

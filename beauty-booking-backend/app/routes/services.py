@@ -15,11 +15,18 @@ def get_services():
     """
     Get all active services (public endpoint)
     GET /api/services
-    Query params: active (optional, default=true)
+    Query params:
+        - active (optional, default=true)
+        - lang (optional, default=en) - Language code: 'en' or 'es'
     """
     try:
         # Check if we should filter by active status
         active_only = request.args.get('active', 'true').lower() == 'true'
+
+        # Get language parameter
+        lang = request.args.get('lang', 'en')
+        if lang not in ['en', 'es']:
+            lang = 'en'
 
         if active_only:
             services = Service.query.filter_by(active=True).order_by(Service.name).all()
@@ -27,7 +34,7 @@ def get_services():
             services = Service.query.order_by(Service.name).all()
 
         return jsonify({
-            'services': [service.to_dict() for service in services],
+            'services': [service.to_dict(lang=lang) for service in services],
             'count': len(services)
         }), 200
 
@@ -40,6 +47,8 @@ def get_service(service_id):
     """
     Get a single service by ID (public endpoint)
     GET /api/services/<service_id>
+    Query params:
+        - lang (optional, default=en) - Language code: 'en' or 'es'
     """
     try:
         service = Service.query.get(service_id)
@@ -47,8 +56,13 @@ def get_service(service_id):
         if not service:
             return jsonify({'error': 'Service not found'}), 404
 
+        # Get language parameter
+        lang = request.args.get('lang', 'en')
+        if lang not in ['en', 'es']:
+            lang = 'en'
+
         return jsonify({
-            'service': service.to_dict()
+            'service': service.to_dict(lang=lang)
         }), 200
 
     except Exception as e:

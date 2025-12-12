@@ -5,6 +5,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { appointmentsAPI } from '../../services/api';
 import { Calendar, Clock, Plus } from 'lucide-react';
 import Card from '../../components/common/Card';
@@ -14,17 +15,18 @@ import { format } from 'date-fns';
 
 const ClientDashboard = () => {
   const { user } = useAuth();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchAppointments();
-  }, []);
+  }, [language]); // Re-fetch when language changes
 
   const fetchAppointments = async () => {
     try {
-      const response = await appointmentsAPI.getMyAppointments({ upcoming: true });
+      const response = await appointmentsAPI.getMyAppointments({ upcoming: true }, language);
       setAppointments(response.data.appointments);
     } catch (err) {
       console.error('Failed to fetch appointments:', err);
@@ -34,8 +36,12 @@ const ClientDashboard = () => {
   };
 
   if (loading) {
-    return <Loading fullScreen text="Loading dashboard..." />;
+    return <Loading fullScreen text={t('dashboard.loadingDashboard')} />;
   }
+
+  const getStatusTranslation = (status) => {
+    return t(`appointments.${status}`) || status;
+  };
 
   return (
     <div className="min-h-screen bg-secondary-50 py-8 px-4">
@@ -43,9 +49,9 @@ const ClientDashboard = () => {
         {/* Welcome Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-secondary-900 mb-2">
-            Welcome back, {user?.name}!
+            {t('dashboard.welcomeBack')}, {user?.name}!
           </h1>
-          <p className="text-secondary-600">Here's your appointment overview</p>
+          <p className="text-secondary-600">{t('dashboard.appointmentOverview')}</p>
         </div>
 
         {/* Quick Actions */}
@@ -56,8 +62,8 @@ const ClientDashboard = () => {
                 <Plus className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-secondary-900">Book Appointment</h3>
-                <p className="text-sm text-secondary-600">Schedule a new service</p>
+                <h3 className="font-semibold text-secondary-900">{t('dashboard.bookAppointment')}</h3>
+                <p className="text-sm text-secondary-600">{t('dashboard.scheduleNewService')}</p>
               </div>
             </div>
           </Card>
@@ -68,8 +74,8 @@ const ClientDashboard = () => {
                 <Calendar className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-secondary-900">My Appointments</h3>
-                <p className="text-sm text-secondary-600">View all bookings</p>
+                <h3 className="font-semibold text-secondary-900">{t('dashboard.myAppointments')}</h3>
+                <p className="text-sm text-secondary-600">{t('dashboard.viewAllBookings')}</p>
               </div>
             </div>
           </Card>
@@ -80,8 +86,8 @@ const ClientDashboard = () => {
                 <Clock className="w-6 h-6 text-primary-600" />
               </div>
               <div>
-                <h3 className="font-semibold text-secondary-900">Browse Services</h3>
-                <p className="text-sm text-secondary-600">View all services</p>
+                <h3 className="font-semibold text-secondary-900">{t('dashboard.browseServices')}</h3>
+                <p className="text-sm text-secondary-600">{t('dashboard.viewAvailableServices')}</p>
               </div>
             </div>
           </Card>
@@ -89,13 +95,13 @@ const ClientDashboard = () => {
 
         {/* Upcoming Appointments */}
         <Card padding="lg">
-          <h2 className="text-2xl font-bold text-secondary-900 mb-6">Upcoming Appointments</h2>
+          <h2 className="text-2xl font-bold text-secondary-900 mb-6">{t('dashboard.upcomingAppointments')}</h2>
 
           {appointments.length === 0 ? (
             <div className="text-center py-12">
               <Calendar className="w-16 h-16 mx-auto text-secondary-300 mb-4" />
-              <p className="text-secondary-600 mb-4">No upcoming appointments</p>
-              <Button onClick={() => navigate('/book')}>Book Your First Appointment</Button>
+              <p className="text-secondary-600 mb-4">{t('dashboard.noUpcomingAppointments')}</p>
+              <Button onClick={() => navigate('/book')}>{t('dashboard.bookFirstAppointment')}</Button>
             </div>
           ) : (
             <div className="space-y-4">
@@ -121,7 +127,7 @@ const ClientDashboard = () => {
                         ? 'bg-green-100 text-green-700'
                         : 'bg-yellow-100 text-yellow-700'
                     }`}>
-                      {appointment.status}
+                      {getStatusTranslation(appointment.status)}
                     </span>
                   </div>
                 </div>

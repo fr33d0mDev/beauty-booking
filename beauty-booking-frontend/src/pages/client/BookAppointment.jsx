@@ -5,6 +5,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { servicesAPI, appointmentsAPI } from '../../services/api';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
@@ -13,6 +14,7 @@ import Loading from '../../components/common/Loading';
 const BookAppointment = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { t, language } = useLanguage();
   const [services, setServices] = useState([]);
   const [selectedService, setSelectedService] = useState(searchParams.get('service') || '');
   const [selectedDate, setSelectedDate] = useState('');
@@ -24,7 +26,7 @@ const BookAppointment = () => {
 
   useEffect(() => {
     fetchServices();
-  }, []);
+  }, [language]); // Re-fetch when language changes
 
   useEffect(() => {
     if (selectedService && selectedDate) {
@@ -34,7 +36,7 @@ const BookAppointment = () => {
 
   const fetchServices = async () => {
     try {
-      const response = await servicesAPI.getAll(true);
+      const response = await servicesAPI.getAll(true, language);
       setServices(response.data.services);
     } catch (err) {
       setError('Failed to load services');
@@ -74,7 +76,7 @@ const BookAppointment = () => {
   };
 
   if (loading) {
-    return <Loading fullScreen text="Loading booking form..." />;
+    return <Loading fullScreen text={t('book.loadingForm')} />;
   }
 
   return (
@@ -83,7 +85,7 @@ const BookAppointment = () => {
         <Card padding="xl">
           <div className="flex items-center gap-3 mb-6">
             <CalendarIcon className="w-8 h-8 text-primary-600" />
-            <h1 className="text-3xl font-bold text-secondary-900">Book Appointment</h1>
+            <h1 className="text-3xl font-bold text-secondary-900">{t('book.title')}</h1>
           </div>
 
           {error && (
@@ -96,7 +98,7 @@ const BookAppointment = () => {
             {/* Service Selection */}
             <div>
               <label className="block text-sm font-medium text-secondary-700 mb-2">
-                Select Service *
+                {t('book.selectService')} *
               </label>
               <select
                 value={selectedService}
@@ -104,10 +106,10 @@ const BookAppointment = () => {
                 className="w-full px-4 py-2 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 required
               >
-                <option value="">Choose a service...</option>
+                <option value="">{t('book.chooseService')}</option>
                 {services.map((service) => (
                   <option key={service.id} value={service.id}>
-                    {service.name} - ${service.price} ({service.duration} min)
+                    {service.name} - ${service.price} ({service.duration} {t('services.minutes')})
                   </option>
                 ))}
               </select>
@@ -116,7 +118,7 @@ const BookAppointment = () => {
             {/* Date Selection */}
             <div>
               <label className="block text-sm font-medium text-secondary-700 mb-2">
-                Select Date *
+                {t('book.selectDate')} *
               </label>
               <input
                 type="date"
@@ -132,10 +134,10 @@ const BookAppointment = () => {
             {selectedService && selectedDate && (
               <div>
                 <label className="block text-sm font-medium text-secondary-700 mb-2">
-                  Select Time *
+                  {t('book.selectTime')} *
                 </label>
                 {availableSlots.length === 0 ? (
-                  <p className="text-secondary-600">No available time slots for this date</p>
+                  <p className="text-secondary-600">{t('book.noAvailableSlots')}</p>
                 ) : (
                   <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                     {availableSlots.map((slot) => (
@@ -164,7 +166,7 @@ const BookAppointment = () => {
               loading={submitting}
               disabled={!selectedService || !selectedDate || !selectedTime || submitting}
             >
-              Confirm Booking
+              {t('book.confirmBooking')}
             </Button>
           </form>
         </Card>

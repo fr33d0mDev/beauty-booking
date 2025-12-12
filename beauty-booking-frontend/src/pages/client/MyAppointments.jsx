@@ -4,6 +4,7 @@
  */
 import { useState, useEffect } from 'react';
 import { appointmentsAPI } from '../../services/api';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { Calendar, Clock, X } from 'lucide-react';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
@@ -12,17 +13,18 @@ import Modal from '../../components/common/Modal';
 import { format } from 'date-fns';
 
 const MyAppointments = () => {
+  const { t, language } = useLanguage();
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cancelModal, setCancelModal] = useState({ open: false, appointmentId: null });
 
   useEffect(() => {
     fetchAppointments();
-  }, []);
+  }, [language]); // Re-fetch when language changes
 
   const fetchAppointments = async () => {
     try {
-      const response = await appointmentsAPI.getMyAppointments();
+      const response = await appointmentsAPI.getMyAppointments({}, language);
       setAppointments(response.data.appointments);
     } catch (err) {
       console.error('Failed to fetch appointments:', err);
@@ -42,19 +44,23 @@ const MyAppointments = () => {
   };
 
   if (loading) {
-    return <Loading fullScreen text="Loading appointments..." />;
+    return <Loading fullScreen text={t('appointments.loadingAppointments')} />;
   }
+
+  const getStatusTranslation = (status) => {
+    return t(`appointments.${status}`) || status;
+  };
 
   return (
     <div className="min-h-screen bg-secondary-50 py-8 px-4">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-secondary-900 mb-8">My Appointments</h1>
+        <h1 className="text-3xl font-bold text-secondary-900 mb-8">{t('appointments.title')}</h1>
 
         {appointments.length === 0 ? (
           <Card padding="xl">
             <div className="text-center py-12">
               <Calendar className="w-16 h-16 mx-auto text-secondary-300 mb-4" />
-              <p className="text-secondary-600 text-lg">No appointments found</p>
+              <p className="text-secondary-600 text-lg">{t('appointments.noAppointments')}</p>
             </div>
           </Card>
         ) : (
@@ -73,7 +79,7 @@ const MyAppointments = () => {
                       </div>
                       <div className="flex items-center gap-2">
                         <Clock className="w-4 h-4" />
-                        <span>{appointment.appointment_time} ({appointment.service.duration} minutes)</span>
+                        <span>{appointment.appointment_time} ({appointment.service.duration} {t('services.minutes')})</span>
                       </div>
                     </div>
                   </div>
@@ -85,7 +91,7 @@ const MyAppointments = () => {
                       appointment.status === 'cancelled' ? 'bg-red-100 text-red-700' :
                       'bg-blue-100 text-blue-700'
                     }`}>
-                      {appointment.status}
+                      {getStatusTranslation(appointment.status)}
                     </span>
 
                     {(appointment.status === 'pending' || appointment.status === 'confirmed') && (
@@ -108,23 +114,23 @@ const MyAppointments = () => {
         <Modal
           isOpen={cancelModal.open}
           onClose={() => setCancelModal({ open: false, appointmentId: null })}
-          title="Cancel Appointment"
+          title={t('appointments.cancelAppointment')}
           footer={
             <>
               <Button
                 variant="ghost"
                 onClick={() => setCancelModal({ open: false, appointmentId: null })}
               >
-                Keep Appointment
+                {t('appointments.keepAppointment')}
               </Button>
               <Button variant="danger" onClick={handleCancel}>
-                Yes, Cancel
+                {t('appointments.yesCancel')}
               </Button>
             </>
           }
         >
           <p className="text-secondary-600">
-            Are you sure you want to cancel this appointment? This action cannot be undone.
+            {t('appointments.confirmCancel')}
           </p>
         </Modal>
       </div>

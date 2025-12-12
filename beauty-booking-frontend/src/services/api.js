@@ -57,8 +57,8 @@ export const authAPI = {
 // ======================
 
 export const servicesAPI = {
-  getAll: (activeOnly = true) => api.get('/services', { params: { active: activeOnly } }),
-  getById: (id) => api.get(`/services/${id}`),
+  getAll: (activeOnly = true, lang = 'en') => api.get('/services', { params: { active: activeOnly, lang } }),
+  getById: (id, lang = 'en') => api.get(`/services/${id}`, { params: { lang } }),
   create: (data) => api.post('/services', data),
   update: (id, data) => api.put(`/services/${id}`, data),
   delete: (id) => api.delete(`/services/${id}`),
@@ -69,9 +69,9 @@ export const servicesAPI = {
 // ======================
 
 export const appointmentsAPI = {
-  getMyAppointments: (params = {}) => api.get('/appointments', { params }),
-  getAllAppointments: (params = {}) => api.get('/appointments/admin', { params }),
-  getById: (id) => api.get(`/appointments/${id}`),
+  getMyAppointments: (params = {}, lang = 'en') => api.get('/appointments', { params: { ...params, lang } }),
+  getAllAppointments: (params = {}, lang = 'en') => api.get('/appointments/admin', { params: { ...params, lang } }),
+  getById: (id, lang = 'en') => api.get(`/appointments/${id}`, { params: { lang } }),
   getAvailableSlots: (serviceId, date) =>
     api.get('/appointments/available-slots', {
       params: { service_id: serviceId, date }

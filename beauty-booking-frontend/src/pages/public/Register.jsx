@@ -5,6 +5,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { Mail, Lock, User, Phone } from 'lucide-react';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
@@ -13,6 +14,7 @@ import Card from '../../components/common/Card';
 const Register = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -89,8 +91,8 @@ const Register = () => {
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12 bg-secondary-50">
       <Card className="w-full max-w-md" padding="xl">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-secondary-900 mb-2">Create Account</h1>
-          <p className="text-secondary-600">Join us and start booking your appointments</p>
+          <h1 className="text-3xl font-bold text-secondary-900 mb-2">{t('auth.createAccount')}</h1>
+          <p className="text-secondary-600">{t('auth.joinUs')}</p>
         </div>
 
         {errors.general && (
@@ -101,7 +103,7 @@ const Register = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            label="Full Name"
+            label={t('auth.fullName')}
             type="text"
             name="name"
             value={formData.name}
@@ -113,7 +115,7 @@ const Register = () => {
           />
 
           <Input
-            label="Email"
+            label={t('auth.email')}
             type="email"
             name="email"
             value={formData.email}
@@ -125,7 +127,7 @@ const Register = () => {
           />
 
           <Input
-            label="Phone Number"
+            label={t('auth.phoneNumber')}
             type="tel"
             name="phone"
             value={formData.phone}
@@ -136,24 +138,24 @@ const Register = () => {
           />
 
           <Input
-            label="Password"
+            label={t('auth.password')}
             type="password"
             name="password"
             value={formData.password}
             onChange={handleChange}
-            placeholder="At least 6 characters"
+            placeholder={t('auth.atLeast6Chars')}
             error={errors.password}
             icon={Lock}
             required
           />
 
           <Input
-            label="Confirm Password"
+            label={t('auth.confirmPassword')}
             type="password"
             name="confirmPassword"
             value={formData.confirmPassword}
             onChange={handleChange}
-            placeholder="Re-enter your password"
+            placeholder={t('auth.confirmPassword')}
             error={errors.confirmPassword}
             icon={Lock}
             required
@@ -167,15 +169,15 @@ const Register = () => {
             size="lg"
             className="mt-6"
           >
-            Create Account
+            {t('auth.createAccount')}
           </Button>
         </form>
 
         <div className="mt-6 text-center">
           <p className="text-secondary-600">
-            Already have an account?{' '}
+            {t('auth.alreadyHaveAccount')}{' '}
             <Link to="/login" className="text-primary-600 font-medium hover:text-primary-700">
-              Sign in
+              {t('auth.signIn')}
             </Link>
           </p>
         </div>
